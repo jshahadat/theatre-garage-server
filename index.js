@@ -69,6 +69,31 @@ async function run() {
         });
 
 
+        // GET CATEGORY 
+        app.get('/categories', async (req, res) => {
+            const query = {};
+            const categories = await categoriesCollection.find(query).toArray();
+            res.send(categories);
+        });
+
+
+        // GET CATEGORIES PRODUCT 
+        app.get('/categories/product', async (req, res) => {
+
+            let query = {};
+
+            if (req.query.categoryName) {
+                query = {
+                    email: req.query.categoryName
+                }
+            }
+            const cursor = productCollection.find(query);
+            const categoryProduct = await cursor.toArray();
+            res.send(categoryProduct);
+        });
+
+
+
 
         // ALL USERS 
         app.get('/users', async (req, res) => {
@@ -83,7 +108,7 @@ async function run() {
 
             let query = {};
 
-            if (req.query.role) {
+            if (req.query.role === "Seller") {
                 query = {
                     role: req.query.role
                 }
