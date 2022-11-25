@@ -282,6 +282,20 @@ async function run() {
             res.send(advertise);
         });
 
+        // VERIFIED SELLER 
+
+        app.put('/dashboard/alluser/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    status: 'Verified'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
 
 
         // DELETE SELLER 
