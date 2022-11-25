@@ -159,6 +159,23 @@ async function run() {
             res.send(result);
         })
 
+
+
+        // EDIT STATUS 
+
+        app.put('/dashboard/myproduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    status: 'sold'
+                }
+            }
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
         // ADVERTISE 
         // app.post('/product/:id', async (req, res) => {
         //     const id = req.params.id;
@@ -181,12 +198,21 @@ async function run() {
             const alreadyAdvertise = await advertiseCollection.find(query).toArray();
 
             if (alreadyAdvertise.length) {
-                const message = `You already have a booking on ${advertise.name}`
+                const message = `You already have Advertise your product on ${advertise.name}`
                 return res.send({ acknowledged: false, message })
             }
 
             const result = await advertiseCollection.insertOne(advertise);
             res.send(result);
+        });
+
+
+        // GET ADVERTISE PRODUCT 
+
+        app.get('/advertise', async (req, res) => {
+            const query = {};
+            const advertise = await advertiseCollection.find(query).toArray();
+            res.send(advertise);
         });
 
 
