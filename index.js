@@ -77,6 +77,7 @@ async function run() {
             res.send(users);
         });
 
+
         // ALL SELLERS 
         app.get('/allsellers', async (req, res) => {
 
@@ -185,7 +186,39 @@ async function run() {
         // })
 
 
+        // get ADVERTISE PRODUCTWITH YES 
 
+        app.get('/advertiseproduct', async (req, res) => {
+
+            let query = {};
+
+            if (req.query.advertise) {
+                query = {
+                    advertise: req.query.advertise
+                }
+            }
+            const cursor = productCollection.find(query);
+            const advertiseproduct = await cursor.toArray();
+            res.send(advertiseproduct);
+        });
+
+
+        // 2Nd TRY ADVERtise 
+        app.put('/dashboard/advertise/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    advertise: 'yes'
+                }
+            }
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
+
+        // 1St try 
         app.post('/advertise', async (req, res) => {
             const advertise = req.body;
             console.log(advertise);
@@ -204,6 +237,15 @@ async function run() {
 
             const result = await advertiseCollection.insertOne(advertise);
             res.send(result);
+        });
+
+
+
+        // GET ALL PRODUCT 
+        app.get('/allproducts', async (req, res) => {
+            const query = {};
+            const allProducts = await productCollection.find(query).toArray();
+            res.send(allProducts);
         });
 
 
