@@ -283,6 +283,17 @@ async function run() {
         });
 
 
+
+        // DELETE SELLER 
+        app.delete('/allseller/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        })
+
+
+        // DELETE PRODUCT 
         app.delete('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
