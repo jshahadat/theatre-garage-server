@@ -103,11 +103,9 @@ async function run() {
         });
 
 
-        // ALL SELLERS 
+        //GET ALL SELLERS 
         app.get('/allsellers', async (req, res) => {
-
             let query = {};
-
             if (req.query.role === "Seller") {
                 query = {
                     role: req.query.role
@@ -119,6 +117,18 @@ async function run() {
         });
 
 
+        // GET ALL BUYER 
+        app.get('/dashboard/allbuyers', async (req, res) => {
+            let query = {};
+            if (req.query.role === "Buyer") {
+                query = {
+                    role: req.query.role
+                }
+            }
+            const cursor = usersCollection.find(query);
+            const allBuyer = await cursor.toArray();
+            res.send(allBuyer);
+        });
 
         // check buyer 
         app.get('/users/buyer/:email', async (req, res) => {
@@ -128,8 +138,6 @@ async function run() {
             res.send({ isBuyer: user?.role === 'Buyer' });
         })
 
-
-
         // check Seller 
         app.get('/users/seller/:email', async (req, res) => {
             const email = req.params.email;
@@ -138,8 +146,6 @@ async function run() {
             res.send({ isSeller: user?.role === 'Seller' });
         })
 
-
-
         // check admin 
         app.get('/users/admin/:email', async (req, res) => {
             const email = req.params.email;
@@ -147,9 +153,6 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'Admin' });
         })
-
-
-
 
 
         // Add Product 
@@ -162,11 +165,8 @@ async function run() {
 
 
         // GET MY PRODUCTS 
-
         app.get('/myproducts', async (req, res) => {
-
             let query = {};
-
             if (req.query.email) {
                 query = {
                     email: req.query.email
@@ -188,7 +188,6 @@ async function run() {
 
 
         // EDIT STATUS 
-
         app.put('/dashboard/myproduct/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
@@ -212,11 +211,8 @@ async function run() {
 
 
         // get ADVERTISE PRODUCTWITH YES 
-
         app.get('/advertiseproduct', async (req, res) => {
-
             let query = {};
-
             if (req.query.advertise) {
                 query = {
                     advertise: req.query.advertise
@@ -244,25 +240,22 @@ async function run() {
 
 
         // 1St try 
-        app.post('/advertise', async (req, res) => {
-            const advertise = req.body;
-            console.log(advertise);
-            const query = {
-                name: advertise.name,
-                email: advertise.email,
-                location: advertise.location
-            }
-
-            const alreadyAdvertise = await advertiseCollection.find(query).toArray();
-
-            if (alreadyAdvertise.length) {
-                const message = `You already have Advertise your product on ${advertise.name}`
-                return res.send({ acknowledged: false, message })
-            }
-
-            const result = await advertiseCollection.insertOne(advertise);
-            res.send(result);
-        });
+        // app.post('/advertise', async (req, res) => {
+        //     const advertise = req.body;
+        //     console.log(advertise);
+        //     const query = {
+        //         name: advertise.name,
+        //         email: advertise.email,
+        //         location: advertise.location
+        //     }
+        //     const alreadyAdvertise = await advertiseCollection.find(query).toArray();
+        //     if (alreadyAdvertise.length) {
+        //         const message = `You already have Advertise your product on ${advertise.name}`
+        //         return res.send({ acknowledged: false, message })
+        //     }
+        //     const result = await advertiseCollection.insertOne(advertise);
+        //     res.send(result);
+        // });
 
 
 
@@ -275,15 +268,14 @@ async function run() {
 
 
         // GET ADVERTISE PRODUCT 
-
         app.get('/advertise', async (req, res) => {
             const query = {};
             const advertise = await advertiseCollection.find(query).toArray();
             res.send(advertise);
         });
 
-        // VERIFIED SELLER 
 
+        // VERIFIED SELLER 
         app.put('/dashboard/alluser/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
@@ -322,10 +314,6 @@ async function run() {
 
 }
 run().catch(console.log);
-
-
-
-
 
 
 app.get('/', async (req, res) => {
