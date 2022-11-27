@@ -44,9 +44,6 @@ async function run() {
         const productsCollection = client.db('oldGolden').collection('products');
 
 
-        const categoriesCollection = client.db('oldGolden').collection('categories');
-
-
         const categoriesProductCollection = client.db('oldGolden').collection('categoriesProduct');
 
         const productCollection = client.db('oldGolden').collection('product');
@@ -55,6 +52,8 @@ async function run() {
 
 
         const usersCollection = client.db('oldGolden').collection('users');
+
+        const bookingsCollection = client.db('oldGolden').collection('bookings');
 
 
 
@@ -72,15 +71,6 @@ async function run() {
         });
 
 
-        // GET CATEGORY 
-        // app.get('/categories', async (req, res) => {
-        //     const query = {};
-        //     const categories = await categoriesCollection.find(query).toArray();
-        //     res.send(categories);
-        // });
-
-
-
 
         // 2ND TRY CATEGORY PRODUCT 
         app.get('/categories', async (req, res) => {
@@ -93,48 +83,52 @@ async function run() {
 
 
 
-        // app.get('/categories/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: ObjectId(id) };
-        //     const products = await categoriesProductCollection.findOne(query);
-        //     res.send(products);
-        // });
+        app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const products = await categoriesProductCollection.findOne(query);
+            res.send(products);
+        });
+
+
+        // ORDERS POST 
+
+
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            console.log(booking);
+            const query = {
+                email: booking.email,
+                productName: booking.productName
+            }
+
+            const alreadyBooked = await bookingsCollection.find(query).toArray();
+
+            if (alreadyBooked.length) {
+                const message = `You already have a Order on ${booking.appointmentDate}`
+                return res.send({ acknowledged: false, message })
+            }
+
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        });
 
 
 
+        // GET CATEGORIES PRODUCT
+        // app.get('/category/:Categoryname', async (req, res) => {
 
-
-
-        // // GET CATEGORY PRODUCT 
-
-        // app.get('/categories/:categoryname', async (req, res) => {
         //     let query = {};
+
         //     if (req.query.categoryName) {
         //         query = {
         //             categoryName: req.query.categoryName
         //         }
         //     }
         //     const cursor = productCollection.find(query);
-        //     const categoryName = await cursor.toArray();
-        //     res.send(categoryName);
+        //     const categoryProduct = await cursor.toArray();
+        //     res.send(categoryProduct);
         // });
-
-
-
-        // GET CATEGORIES PRODUCT
-        app.get('/category/:Categoryname', async (req, res) => {
-
-            let query = {};
-
-            if (req.query.categoryName) {
-                query = {
-                    categoryName: req.query.categoryName
-                }
-            }
-            const cursor = productCollection.find(query);
-            const categoryProduct = await cursor.toArray();
-            res.send(categoryProduct);
-        });
 
         // app.get('/category/:name', async (req, res) => {
         //     const categoryName = req.params.categoryName;
