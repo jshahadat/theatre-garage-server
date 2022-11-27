@@ -92,8 +92,6 @@ async function run() {
 
 
         // ORDERS POST 
-
-
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
             console.log(booking);
@@ -111,6 +109,20 @@ async function run() {
 
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
+        });
+
+
+        // GET MY ORDERS 
+        app.get('/myorders', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = bookingsCollection.find(query);
+            const order = await cursor.toArray();
+            res.send(order);
         });
 
 
