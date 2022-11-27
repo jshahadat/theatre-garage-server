@@ -46,6 +46,9 @@ async function run() {
 
         const categoriesCollection = client.db('oldGolden').collection('categories');
 
+
+        const categoriesProductCollection = client.db('oldGolden').collection('categoriesProduct');
+
         const productCollection = client.db('oldGolden').collection('product');
 
         const advertiseCollection = client.db('oldGolden').collection('advertise');
@@ -70,21 +73,62 @@ async function run() {
 
 
         // GET CATEGORY 
+        // app.get('/categories', async (req, res) => {
+        //     const query = {};
+        //     const categories = await categoriesCollection.find(query).toArray();
+        //     res.send(categories);
+        // });
+
+
+
+
+        // 2ND TRY CATEGORY PRODUCT 
         app.get('/categories', async (req, res) => {
-            const query = {};
-            const categories = await categoriesCollection.find(query).toArray();
+            const query = {}
+            const cursor = categoriesProductCollection.find(query);
+
+            const categories = await cursor.toArray();
             res.send(categories);
         });
 
 
-        // GET CATEGORIES PRODUCT 
-        app.get('/categories/product', async (req, res) => {
+
+        // app.get('/categories/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: ObjectId(id) };
+        //     const products = await categoriesProductCollection.findOne(query);
+        //     res.send(products);
+        // });
+
+
+
+
+
+
+        // // GET CATEGORY PRODUCT 
+
+        // app.get('/categories/:categoryname', async (req, res) => {
+        //     let query = {};
+        //     if (req.query.categoryName) {
+        //         query = {
+        //             categoryName: req.query.categoryName
+        //         }
+        //     }
+        //     const cursor = productCollection.find(query);
+        //     const categoryName = await cursor.toArray();
+        //     res.send(categoryName);
+        // });
+
+
+
+        // GET CATEGORIES PRODUCT
+        app.get('/category/:Categoryname', async (req, res) => {
 
             let query = {};
 
             if (req.query.categoryName) {
                 query = {
-                    email: req.query.categoryName
+                    categoryName: req.query.categoryName
                 }
             }
             const cursor = productCollection.find(query);
@@ -92,6 +136,12 @@ async function run() {
             res.send(categoryProduct);
         });
 
+        // app.get('/category/:name', async (req, res) => {
+        //     const categoryName = req.params.categoryName;
+        //     const query = { categoryName };
+        //     const result = await productCollection.find(query);
+        //     res.send(result);
+        // })
 
 
 
@@ -187,7 +237,7 @@ async function run() {
 
 
 
-        // EDIT STATUS 
+        // EDIT PRODUCT STATUS 
         app.put('/dashboard/myproduct/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
@@ -210,7 +260,7 @@ async function run() {
         // })
 
 
-        // get ADVERTISE PRODUCTWITH YES 
+        // get ADVERTISE PRODUCT WITH YES 
         app.get('/advertiseproduct', async (req, res) => {
             let query = {};
             if (req.query.advertise) {
@@ -292,6 +342,14 @@ async function run() {
 
         // DELETE SELLER 
         app.delete('/allseller/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // DELETE BUYERS 
+        app.delete('/dashboard/allbuyers/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
