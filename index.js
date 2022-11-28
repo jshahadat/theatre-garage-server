@@ -325,7 +325,7 @@ async function run() {
 
 
         // get ADVERTISE PRODUCT WITH YES 
-        app.get('/advertiseproduct', verifyJWT, async (req, res) => {
+        app.get('/advertiseproduct', async (req, res) => {
             let query = {};
             if (req.query.advertise) {
                 query = {
