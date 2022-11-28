@@ -107,10 +107,10 @@ async function run() {
 
             const alreadyBooked = await bookingsCollection.find(query).toArray();
 
-            if (alreadyBooked.length) {
-                const message = `You already have a Order on ${booking.appointmentDate}`
-                return res.send({ acknowledged: false, message })
-            }
+            // if (alreadyBooked.length) {
+            //     const message = `You already have a Order on ${booking.appointmentDate}`
+            //     return res.send({ acknowledged: false, message })
+            // }
 
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
@@ -172,31 +172,6 @@ async function run() {
             const updatedResult = await bookingsCollection.updateOne(filter, updatedDoc)
             res.send(result);
         })
-
-
-        // GET CATEGORIES PRODUCT
-        // app.get('/category/:Categoryname', async (req, res) => {
-
-        //     let query = {};
-
-        //     if (req.query.categoryName) {
-        //         query = {
-        //             categoryName: req.query.categoryName
-        //         }
-        //     }
-        //     const cursor = productCollection.find(query);
-        //     const categoryProduct = await cursor.toArray();
-        //     res.send(categoryProduct);
-        // });
-
-        // app.get('/category/:name', async (req, res) => {
-        //     const categoryName = req.params.categoryName;
-        //     const query = { categoryName };
-        //     const result = await productCollection.find(query);
-        //     res.send(result);
-        // })
-
-
 
         // ALL USERS 
         app.get('/users', async (req, res) => {
@@ -281,6 +256,22 @@ async function run() {
         });
 
 
+
+        // GET ALL PRODUCTS IN CATEGORY PAGE 
+        app.get('/allproducts', async (req, res) => {
+            let query = {};
+            if (req.query.categoryName) {
+                query = {
+                    categoryName: req.query.categoryName
+                }
+            }
+            const cursor = productCollection.find(query);
+            const allProduct = await cursor.toArray();
+            res.send(allProduct);
+        });
+
+
+
         // Users 
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -289,6 +280,34 @@ async function run() {
         })
 
 
+
+
+        // REPORT PRODUCT 
+        app.put('/adertiseproduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    reported: 'yes'
+                }
+            }
+            const result = await productCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
+
+        // GET REPORTED PRODUCTS 
+        app.get('/repotedproducts', async (req, res) => {
+            let query = {};
+            if (req.query.reported = "yes") {
+                query = {
+                    reported: req.query.reported
+                }
+            }
+            const cursor = productCollection.find(query);
+            const reportedproduct = await cursor.toArray();
+            res.send(reportedproduct);
+        });
 
         // EDIT PRODUCT STATUS 
         app.put('/dashboard/myproduct/:id', async (req, res) => {
