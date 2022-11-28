@@ -117,17 +117,17 @@ async function run() {
         });
 
 
-        // GET MY ORDERS 
-        app.get('/myorders', async (req, res) => {
-            let query = {};
-            if (req.query.email) {
-                query = {
-                    email: req.query.email
-                }
+        app.get('/myorders', verifyJWT, async (req, res) => {
+            const email = req.query.email;
+            const decodedEmail = req.decoded.email;
+
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' });
             }
-            const cursor = bookingsCollection.find(query);
-            const order = await cursor.toArray();
-            res.send(order);
+
+            const query = { email: email };
+            const bookings = await bookingsCollection.find(query).toArray();
+            res.send(bookings);
         });
 
 
@@ -182,7 +182,7 @@ async function run() {
 
 
         //GET ALL SELLERS 
-        app.get('/allsellers', async (req, res) => {
+        app.get('/allsellers', verifyJWT, async (req, res) => {
             let query = {};
             if (req.query.role === "Seller") {
                 query = {
@@ -196,7 +196,7 @@ async function run() {
 
 
         // GET ALL BUYER 
-        app.get('/dashboard/allbuyers', async (req, res) => {
+        app.get('/dashboard/allbuyers', verifyJWT, async (req, res) => {
             let query = {};
             if (req.query.role === "Buyer") {
                 query = {
@@ -283,7 +283,7 @@ async function run() {
 
 
         // REPORT PRODUCT 
-        app.put('/adertiseproduct/:id', async (req, res) => {
+        app.put('/adertiseproduct/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
             const options = { upsert: true };
@@ -323,17 +323,9 @@ async function run() {
             res.send(result);
         });
 
-        // ADVERTISE 
-        // app.post('/product/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: ObjectId(id) };
-        //     const result = await advertiseCollection.insertOne(query);
-        //     res.send(result);
-        // })
-
 
         // get ADVERTISE PRODUCT WITH YES 
-        app.get('/advertiseproduct', async (req, res) => {
+        app.get('/advertiseproduct', verifyJWT, async (req, res) => {
             let query = {};
             if (req.query.advertise) {
                 query = {
@@ -359,26 +351,6 @@ async function run() {
             const result = await productCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
-
-
-        // 1St try 
-        // app.post('/advertise', async (req, res) => {
-        //     const advertise = req.body;
-        //     console.log(advertise);
-        //     const query = {
-        //         name: advertise.name,
-        //         email: advertise.email,
-        //         location: advertise.location
-        //     }
-        //     const alreadyAdvertise = await advertiseCollection.find(query).toArray();
-        //     if (alreadyAdvertise.length) {
-        //         const message = `You already have Advertise your product on ${advertise.name}`
-        //         return res.send({ acknowledged: false, message })
-        //     }
-        //     const result = await advertiseCollection.insertOne(advertise);
-        //     res.send(result);
-        // });
-
 
 
         // GET ALL PRODUCT 
@@ -413,7 +385,7 @@ async function run() {
 
 
         // DELETE SELLER 
-        app.delete('/allseller/:id', async (req, res) => {
+        app.delete('/allseller/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
@@ -421,7 +393,7 @@ async function run() {
         })
 
         // DELETE BUYERS 
-        app.delete('/dashboard/allbuyers/:id', async (req, res) => {
+        app.delete('/dashboard/allbuyers/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await usersCollection.deleteOne(query);
@@ -430,7 +402,7 @@ async function run() {
 
 
         // DELETE PRODUCT 
-        app.delete('/product/:id', async (req, res) => {
+        app.delete('/product/:id', verifyJWT, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
